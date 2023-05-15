@@ -1,19 +1,20 @@
 package br.com.picpaytest.entity
 
 import java.util.UUID
+import javax.persistence.Column
+import javax.persistence.Entity
+import javax.persistence.Id
+import javax.persistence.Table
 
+@Entity
+@Table(name = "`user`")
 class User(
-//    @Id
-    id: String = UUID.randomUUID().toString(),
-//    @Column(nullable = false, unique = true)
-    email: String,
-//    @Column(nullable = false, unique = true)
-    documentId: String,
-//    @Column(nullable = false)
-    password: String
-): Provider(
-    id = id,
-    email = email,
-    documentId = documentId,
-    password = password
-)
+    @Id
+    override val id: String = UUID.randomUUID().toString(),
+    @Column(nullable = false, unique = true)
+    override var email: String,
+    @Column(nullable = false, unique = true)
+    override var documentId: String,
+    @Column(nullable = false)
+    override var password: String
+) : Provider

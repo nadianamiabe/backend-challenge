@@ -1,10 +1,8 @@
 package br.com.picpaytest.entity
 
-import java.util.*
-
-abstract class Provider (
-    private val id: String = UUID.randomUUID().toString(),
-    private val email: String,
-    private val documentId: String,
-    private val password: String
-)
+interface Provider {
+    val id: String
+    var email: String
+    var documentId: String
+    var password: String
+}
