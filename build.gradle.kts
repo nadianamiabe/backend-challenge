@@ -6,6 +6,7 @@ plugins {
 	kotlin("jvm") version "1.6.21"
 	kotlin("plugin.spring") version "1.6.21"
 	kotlin("plugin.jpa") version "1.6.21"
+	kotlin("plugin.noarg") version "1.6.21"
 }
 
 group = "br.com"
@@ -21,11 +22,16 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
+	implementation("org.springframework.boot:spring-boot-starter-security")
+	implementation("org.springframework.security:spring-security-test")
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	runtimeOnly("org.hsqldb:hsqldb")
 	runtimeOnly ("mysql:mysql-connector-java:5.1.40")
-//	runtimeOnly ("org.liquibase:liquibase-core")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	runtimeOnly ("com.h2database:h2")
+	implementation("org.jetbrains.kotlin:kotlin-allopen")
+	implementation("org.jetbrains.kotlin:kotlin-noarg")
+	runtimeOnly("org.flywaydb:flyway-core")
 }
 
 tasks.withType<KotlinCompile> {
