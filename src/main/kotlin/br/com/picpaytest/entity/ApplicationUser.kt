@@ -1,12 +1,12 @@
 package br.com.picpaytest.entity
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import java.time.LocalDateTime
 import java.util.UUID
 import javax.persistence.*
 
 @Entity
-@Table(name = "`user`")
-data class User(
+data class ApplicationUser(
     @Id
     @Column(length = 36)
     val id: String = UUID.randomUUID().toString(),
@@ -18,16 +18,10 @@ data class User(
     val fullName: String,
     @Column(nullable = false)
     val password: String,
-    @Column(nullable = false)
+    @JsonIgnore
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-        name = "user_roles",
-        joinColumns = [JoinColumn(name = "user_id")],
-        inverseJoinColumns = [JoinColumn(name = "role_id")]
-    )
-    val roles: MutableSet<Role> = mutableSetOf(),
-    @OneToOne(mappedBy = "user", cascade = [CascadeType.ALL])
-    val wallet: Wallet,
+    @JoinColumn(name = "user_roles")
+    val roles: List<Role> = mutableListOf(),
     @Column(nullable = false)
     val createdDate: LocalDateTime
 )
