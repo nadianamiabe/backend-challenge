@@ -28,6 +28,7 @@ class WebSecurityConfig(
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
             .authorizeRequests()
             .antMatchers(HttpMethod.POST,"/login").permitAll()
+                .antMatchers("/h2-console/**").permitAll()
             .anyRequest().authenticated().and()
             .addFilterBefore(filter, UsernamePasswordAuthenticationFilter::class.java)
             .build()

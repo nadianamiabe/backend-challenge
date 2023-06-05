@@ -29,7 +29,8 @@ create table wallet(
 create table `transaction`(
     id varchar(36) not null,
     amount decimal(10, 2) not null,
-    application_user_id varchar(36) not null,
+--     application_user_id varchar(36) not null,
+    status varchar(20) not null,
     sender_wallet_id varchar(36) not null,
     receiver_wallet_id varchar(36) not null,
     created_date datetime not null,

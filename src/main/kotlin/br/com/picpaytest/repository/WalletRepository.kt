@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface WalletRepository : JpaRepository<Wallet, String> {
+    fun getByApplicationUserId(userId: String): Wallet
 }

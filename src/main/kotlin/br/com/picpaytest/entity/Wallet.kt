@@ -14,8 +14,18 @@ data class Wallet(
     @Column(length = 36)
     val id: String = UUID.randomUUID().toString(),
     @Column(nullable = false)
-    val balance: BigDecimal = BigDecimal.ZERO,
+    var balance: BigDecimal = BigDecimal.ZERO,
     @OneToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "application_user_id")
     val applicationUser: ApplicationUser
-)
+) {
+    fun deposit(value: BigDecimal) {
+        this.balance += value
+    }
+
+    fun withdraw(value: BigDecimal) {
+        if (value <= this.balance) {
+            this.balance -= value
+        }
+    }
+}

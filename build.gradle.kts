@@ -25,14 +25,18 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.springframework.security:spring-security-test")
 	implementation("com.auth0:java-jwt:4.2.1")
-	developmentOnly("org.springframework.boot:spring-boot-devtools")
-	runtimeOnly("org.hsqldb:hsqldb")
-	runtimeOnly ("mysql:mysql-connector-java:5.1.40")
-	testImplementation("org.springframework.boot:spring-boot-starter-test")
-	runtimeOnly ("com.h2database:h2")
 	implementation("org.jetbrains.kotlin:kotlin-allopen")
 	implementation("org.jetbrains.kotlin:kotlin-noarg")
+
+	developmentOnly("org.springframework.boot:spring-boot-devtools")
+
+	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	testImplementation ("org.hamcrest:hamcrest:2.1")
+
+	runtimeOnly ("com.h2database:h2")
 	runtimeOnly("org.flywaydb:flyway-core")
+	runtimeOnly("org.hsqldb:hsqldb")
+	runtimeOnly ("mysql:mysql-connector-java:5.1.40")
 }
 
 tasks.withType<KotlinCompile> {

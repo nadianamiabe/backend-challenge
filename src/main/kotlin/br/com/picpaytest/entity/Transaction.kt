@@ -16,8 +16,10 @@ data class Transaction(
     @Enumerated(value = EnumType.STRING)
     val status: TransactionStatus,
     @ManyToOne
+    @JoinColumn(name = "sender_wallet_id")
     val senderWallet: Wallet,
     @ManyToOne
+    @JoinColumn(name = "receiver_wallet_id")
     val receiverWallet: Wallet,
     @Column(nullable = false)
     val createdDate: LocalDateTime
