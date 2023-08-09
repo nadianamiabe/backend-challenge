@@ -1,5 +1,7 @@
 package br.com.picpaytest.service
 
+import br.com.picpaytest.client.ExternalAuthorizationMockApi
+import br.com.picpaytest.client.NotificationMockDispatcher
 import br.com.picpaytest.dto.TransactionInputDTO
 import br.com.picpaytest.entity.ApplicationUser
 import br.com.picpaytest.entity.Transaction
@@ -17,12 +19,11 @@ import javax.transaction.Transactional
 
 @Service
 class TransactionService(
-    @Autowired
-    private val userRepository: UserRepository,
-    @Autowired
-    private val transactionRepository: TransactionRepository,
-    @Autowired
-    private val walletRepository: WalletRepository
+    @Autowired private val userRepository: UserRepository,
+    @Autowired private val transactionRepository: TransactionRepository,
+    @Autowired private val walletRepository: WalletRepository,
+    @Autowired private val externalAuthorizationApi: ExternalAuthorizationMockApi,
+    @Autowired private val notificationDispatcher: NotificationMockDispatcher
 ) {
     @Transactional
     fun create(transactionInputDTO: TransactionInputDTO): Transaction {
@@ -49,8 +50,18 @@ class TransactionService(
                 )
         )
 
-        senderWallet.withdraw(transactionInputDTO.amount)
-        receiverWallet.deposit(transactionInputDTO.amount)
+        externalAuthorizationApi.authorize().message.run {
+            if (this == "Autorizado") {
+                senderWallet.withdraw(transactionInputDTO.amount)
+                receiverWallet.deposit(transactionInputDTO.amount)
+
+                transaction.status = TransactionStatus.FINISHED
+                notificationDispatcher.send()
+            } else {
+                transaction.status = TransactionStatus.CANCELLED
+            }
+            transactionRepository.save(transaction)
+        }
 
         return transaction
     }

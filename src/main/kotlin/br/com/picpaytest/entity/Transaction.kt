@@ -14,7 +14,7 @@ data class Transaction(
     @Column(nullable = false)
     val amount: BigDecimal,
     @Enumerated(value = EnumType.STRING)
-    val status: TransactionStatus,
+    var status: TransactionStatus,
     @ManyToOne
     @JoinColumn(name = "sender_wallet_id")
     val senderWallet: Wallet,

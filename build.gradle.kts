@@ -9,12 +9,30 @@ plugins {
 	kotlin("plugin.noarg") version "1.6.21"
 }
 
+//ext {
+//	set("springCloudVersion", "2022.0.1")
+//}
+
 group = "br.com"
 version = "0.0.1-SNAPSHOT"
 java.sourceCompatibility = JavaVersion.VERSION_11
 
 repositories {
 	mavenCentral()
+}
+//
+//dependencyManagement {
+//	imports {
+//		mavenBom("org.springframework.cloud:spring-cloud-dependencies:2022.0.3") {
+//			bomProperty("aws-java-sdk.version", "1.11.666")
+//		}
+//	}
+//}
+
+dependencyManagement {
+	imports {
+		mavenBom("org.springframework.cloud:spring-cloud-dependencies:2021.0.3")
+	}
 }
 
 dependencies {
@@ -27,16 +45,20 @@ dependencies {
 	implementation("com.auth0:java-jwt:4.2.1")
 	implementation("org.jetbrains.kotlin:kotlin-allopen")
 	implementation("org.jetbrains.kotlin:kotlin-noarg")
+	implementation("org.springframework.cloud:spring-cloud-openfeign-core")
+	implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
+//	implementation("io.github.openfeign:feign-jackson:11.10")
 
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
-	testImplementation ("org.hamcrest:hamcrest:2.1")
+	testImplementation("org.hamcrest:hamcrest:2.1")
+	testImplementation("com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0")
 
-	runtimeOnly ("com.h2database:h2")
+	runtimeOnly("com.h2database:h2")
 	runtimeOnly("org.flywaydb:flyway-core")
 	runtimeOnly("org.hsqldb:hsqldb")
-	runtimeOnly ("mysql:mysql-connector-java:5.1.40")
+	runtimeOnly("mysql:mysql-connector-java:5.1.40")
 }
 
 tasks.withType<KotlinCompile> {

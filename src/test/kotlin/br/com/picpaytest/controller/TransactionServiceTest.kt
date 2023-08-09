@@ -1,5 +1,7 @@
 package br.com.picpaytest.controller
 
+import br.com.picpaytest.client.ExternalAuthorizationMockApi
+import br.com.picpaytest.dto.ExternalAuthorizationDTO
 import br.com.picpaytest.dto.TransactionInputDTO
 import br.com.picpaytest.entity.ApplicationUser
 import br.com.picpaytest.entity.Role
@@ -8,6 +10,7 @@ import br.com.picpaytest.enum.TransactionStatus
 import br.com.picpaytest.repository.UserRepository
 import br.com.picpaytest.repository.WalletRepository
 import br.com.picpaytest.service.TransactionService
+import com.nhaarman.mockitokotlin2.given
 import org.hamcrest.CoreMatchers
 import org.hamcrest.MatcherAssert
 import org.junit.jupiter.api.Test
@@ -16,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException
 import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.ActiveProfiles
@@ -36,6 +40,9 @@ class TransactionServiceTest {
 
     @Autowired
     lateinit var walletRepository: WalletRepository
+
+    @MockBean
+    lateinit var externalAuthorizationApi: ExternalAuthorizationMockApi
 
     @Test
     fun shouldThrowNotFoundExceptionIfUserDoesntExist() {
@@ -126,7 +133,7 @@ class TransactionServiceTest {
     }
 
     @Test
-    fun shouldCreatePendingTransaction() {
+    fun shouldUpdateTransactionToFinishedStatus() {
         val user = userRepository.saveAndFlush(ApplicationUser(
                 email = "teste@teste.com",
                 documentId = "111",
@@ -161,10 +168,57 @@ class TransactionServiceTest {
                 amount = BigDecimal(50.00)
         )
 
+        given(externalAuthorizationApi.authorize()).willReturn(ExternalAuthorizationDTO(message = "Autorizado"))
+
         val transaction = transactionService.create(input)
 
-        MatcherAssert.assertThat(transaction.status, CoreMatchers.`is`(TransactionStatus.PENDING))
+        MatcherAssert.assertThat(transaction.status, CoreMatchers.`is`(TransactionStatus.FINISHED))
         MatcherAssert.assertThat(transaction.receiverWallet.balance.toInt(), CoreMatchers.`is`(150))
         MatcherAssert.assertThat(transaction.senderWallet.balance.toInt(), CoreMatchers.`is`(50))
+    }
+
+    @Test
+    fun shouldUpdateTransactionToCancelledStatus() {
+        val user = userRepository.saveAndFlush(ApplicationUser(
+            email = "teste@teste.com",
+            documentId = "111",
+            fullName = "teste teste",
+            password = "123",
+            createdDate = LocalDateTime.now(),
+            roles = listOf(Role("COMMON_USER"))
+        ))
+
+        val payee = userRepository.saveAndFlush(ApplicationUser(
+            email = "teste22@teste.com",
+            documentId = "222",
+            fullName = "teste teste 2",
+            password = "1234",
+            createdDate = LocalDateTime.now(),
+            roles = listOf(Role("COMMON_USER"))
+        ))
+
+        walletRepository.saveAndFlush(Wallet(
+            balance = BigDecimal(100.00),
+            applicationUser = user
+        ))
+
+        walletRepository.saveAndFlush(Wallet(
+            balance = BigDecimal(100.00),
+            applicationUser = payee
+        ))
+
+        val input = TransactionInputDTO(
+            userId = user.id,
+            payeeId = payee.id,
+            amount = BigDecimal(50.00)
+        )
+
+        given(externalAuthorizationApi.authorize()).willReturn(ExternalAuthorizationDTO(message = "xxx"))
+
+        val transaction = transactionService.create(input)
+
+        MatcherAssert.assertThat(transaction.status, CoreMatchers.`is`(TransactionStatus.CANCELLED))
+        MatcherAssert.assertThat(transaction.receiverWallet.balance.toInt(), CoreMatchers.`is`(100))
+        MatcherAssert.assertThat(transaction.senderWallet.balance.toInt(), CoreMatchers.`is`(100))
     }
 }
